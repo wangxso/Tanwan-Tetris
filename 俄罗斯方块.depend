@@ -1,0 +1,15 @@
+# depslib dependency file v1.0
+1529812496 source:f:\项目\俄罗斯方块\俄罗斯方块\main.cpp
+	<graphics.h>
+	<math.h>
+	<stdio.h>
+	<time.h>
+	<bits/stdc++.h>
+	<windows.h>
+	<mmsystem.h>
+
+1528604833 source:f:\项目\俄罗斯方块\俄罗斯方块\2.cpp
+	<graphics.h>
+
+1529398936 source:f:\项目\俄罗斯方块\俄罗斯方块\save.cpp
+
