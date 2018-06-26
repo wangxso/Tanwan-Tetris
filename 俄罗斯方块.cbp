@@ -36,6 +36,7 @@
 			<Add option="-mwindows" />
 		</Linker>
 		<Unit filename="main.cpp" />
+		<Unit filename="tetris.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

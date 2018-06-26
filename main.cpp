@@ -1,15 +1,4 @@
-#include <graphics.h>
-#include <math.h>
-#include <stdio.h>
-#include <time.h>
-#include<bits/stdc++.h>
-#include<windows.h>
-#include <mmsystem.h>
-
-#pragma comment(lib, "WINMM.LIB")
-#define SCRW 680
-#define SCRH 640
-int DELAY = 50   ; //延时时间
+#include "tetris.h"
 /*******************************
     项目名称:
     俄罗斯方块
@@ -41,69 +30,8 @@ int DELAY = 50   ; //延时时间
     <修改部分文字颜色不一致>
     2018/06/24 10:20:22
     <优化排行榜显示>
-    2018/06/24 11:35:44
-    <增加排行榜删除选项>(去除)
-
-******************************/
-/********************************结构体区****************************/
-typedef struct AdATA
-{
-    int score;
-    char timeinfo[100];
-    char id[100];
-} ADATA;
-typedef struct ablock_s //块的结构体
-{
-    int x;              //旋转中心坐标
-    int y;
-    int xy[4][2];       //每一块的坐标
-    color_t color;
-} ablock;
-/***********************************************/
-/***********************变量区*******************************/
-mouse_msg msg;
-bool Mouse_Up;
-bool Mouse_Down;
-bool Mouse_Left;
-bool Mouse_Right;
-int zt[10][21];     //每个方格状态0未填充1已填充str[100];
-int live=1;         //块是否还活着
-int Mouse_X, Mouse_Y;
-long score,xh;      //分数和消行
-char scores[50];    //分数显示字符串
-char xhs[50];       //消行显示字符串
-ADATA data[1000];
-PIMAGE raw;
-PIMAGE img,mode,ranklist,bk,bk1;
-int pow_score = 1;
-bool flag = true;
-/**********************************************************/
-
-/***********************函数区域***************************/
-ADATA getTime();
-int menu();
-int showlist();
-int Judge_down(ablock* block);
-int Judge_left(ablock* block);
-int mousepos(int *x, int *y);
-int Judge_right(ablock* block);
-int saveGame(int steps,char *timetext);
-void loadImg();
-void del_img();
-void initgame();
-void mode_seltct();
-void clearone(int i);
-void init_mouseseg();
-void draw_play_place();//绘制游戏区域
-void Double_PlayGame();//双人游戏
-void delete_ranklist_one();
-void rotate_(ablock* block);//旋转
-void updatezt(ablock* block);
-void drawblock(ablock* block);//画方块
-void movew(ablock* block,int where);
-void Get_point(ablock* block,int x,int y,int n);//获取旋转中心
-/*************************************************************/
-
+    2018/06/26 08:34:56
+    <音乐跳转优化>
 /************************实现区****************************/
 void draw_play_place()
 {
@@ -179,7 +107,7 @@ void playGame()
     //下一个方块
     int rk1=1+rand()%7;
     //随机产生1到7
-    for(int x=0; x<10; x++)
+   for(int x=0; x<10; x++)
         zt[x][20]=1;
     for(int n=0;; Sleep(10),n++)
         //主循环
@@ -190,11 +118,11 @@ void playGame()
         if(live==1)
         {
             live=0;
-            testbl.x=241+10-20;
             //生成两个块当前的和下一个
+            testbl.x=241+10-20;
             testbl.y=161+10-20;
-            nextbl.x=500+10;
             //预览生成坐标
+            nextbl.x=500+10;
             nextbl.y=100+10;
             Get_point(&testbl,testbl.x,testbl.y,rk1);
             rk1=1+rand()%7;
@@ -252,6 +180,7 @@ void playGame()
                 }
                 if(whatfx.key == VK_ESCAPE )
                 {
+                    flag = true;
                     //live = 0;
                     if(score>0)
                     {
@@ -307,9 +236,9 @@ int main()
     setinitmode(0);
     initgraph(SCRW,SCRH);
     setcaption("贪玩俄罗斯方块v2.4");
-    mciSendString(TEXT("open bgm.mp3 alias mysong"), NULL,0,NULL);
-    mciSendString(TEXT("open bgm1.mp3 alias song1"),NULL,0,NULL);
-    mciSendString(TEXT("open bgm2.mp3 alias song2"),NULL,0,NULL);
+    //mciSendString(TEXT("open bgm.mp3 alias mysong"), NULL,0,NULL);
+    //mciSendString(TEXT("open bgm1.mp3 alias song1"),NULL,0,NULL);
+    //mciSendString(TEXT("open bgm2.mp3 alias song2"),NULL,0,NULL);
     loadImg();
     menu();
     getch();
@@ -480,6 +409,10 @@ void clearone(int i)
     {
         bar(20*k+141,141+20*i,20*k+141+19,141+20*i+19);
     }
+
+
+
+
 }
 //方格状态更新
 void updatezt(ablock* block)
@@ -505,6 +438,7 @@ void updatezt(ablock* block)
         if(j==10)
             //一行全部被填充
         {
+
             clearone(i);
             xh++;
             kill++;
@@ -525,11 +459,18 @@ void updatezt(ablock* block)
                     }
                     zt[k][down+1]=zt[k][down];
                     //下移
+
+
                 }
 
             }
+            ///消除音效
+            mciSendString(TEXT("close song0"),NULL,0,NULL);
+            mciSendString(TEXT("open xcyx.mp3 alias song0"),NULL,0,NULL);
+            mciSendString(TEXT("play song0"),NULL,0,NULL);
 
         }
+
     }
     if(kill==1)
         score=score+1;
@@ -682,6 +623,9 @@ int saveGame(int steps,char *timetext)//存储游戏
 int showlist()
 //显示排行榜
 {
+    close_Music();
+    open_Music();
+    mciSendString(TEXT("play song3 repeat"),NULL,0,NULL);
     ege::cleardevice();
     ege::putimage_transparent(NULL,ranklist,BLACK,0,0);
     char recoder[100];
@@ -760,12 +704,17 @@ int menu()
 //初始进入界面
 {
     //PlaySound(TEXT("//a.wav"), NULL, SND_FILENAME | SND_ASYNC |SND_LOOP );
-    mciSendString(TEXT("play mysong repeat"), NULL, 0, NULL);//打开音乐
+
     //mciSendString(TEXT("close mysong"), NULL, 0, NULL);
     initgame();
+    close_Music();
+    open_Music();
+    mciSendString(TEXT("play mysong repeat"), NULL, 0, NULL);//打开音乐
     for(; ege::is_run(); ege::delay_fps(60))
     {
+
         ege::cleardevice();
+        ege::putimage(600,580,open);
         ege::putimage(0,0,img);
         int x,y;
         char pos[100];
@@ -782,9 +731,9 @@ int menu()
         {
             if(msg.is_down())
             {
-                mciSendString(TEXT("close mysong"), NULL, 0, NULL);
-                mciSendString(TEXT("close song1"), NULL, 0, NULL);
-                mciSendString(TEXT("close song2"), NULL, 0, NULL);
+                ege::putimage(600,580,close);
+
+                close_Music();
             }
 
         }
@@ -792,18 +741,20 @@ int menu()
         {
             if(msg.is_down())
             {
-                mciSendString(TEXT("open bgm.mp3 alias mysong"), NULL, 0,NULL);
-                mciSendString(TEXT("open bgm1.mp3 alias song1"), NULL, 0,NULL);
-                mciSendString(TEXT("open bgm2.mp3 alias song2"), NULL, 0,NULL);
+                ege::putimage(600,580,open);
+                open_Music();
                 mciSendString(TEXT("play mysong repeat"),NULL,0,NULL);
             }
         }
 
 
-        if(x>=249 && y>=327 && x<=472 && y<=380)
+        if(x>=249 && y>=327 && x<=472 && y<=380)//开始游戏按键
         {
             if(msg.is_down()&& flag==true )
             {
+                close_Music();
+                open_Music();
+                mciSendString(TEXT("play song4"),0,0,0);
                 flag = false;
                 mode_seltct();
             }
@@ -811,6 +762,7 @@ int menu()
         }
         if(x>=251 && x<=430 && y>=484 && y<=528 && msg.is_down())
         {
+            flag= true;
             showlist();
         }
         if(x>0 && x<=190 && y>=576 && y<640)
@@ -842,6 +794,7 @@ void mode_seltct()
         {
 
             ege::putimage(100,230,raw);
+
             if(msg.is_down())
             {
                 pow_score = 1;
@@ -849,15 +802,16 @@ void mode_seltct()
                 playGame();
             }
         }
-        if(x>215&&y>360&&x<430&&y<425 && flag == false)
+        if(x>215&&y>360&&x<430&&y<425 )
             //一般模式
         {
 
-            flag = true;
-            ege::putimage(100,340,raw);
 
-            if(msg.is_down())
+            ege::putimage(100,340,raw);
+            //ege::putimage(0,0,soso);
+            if(msg.is_down()&& flag == false)
             {
+                flag = true;
                 mciSendString(TEXT("close mysong"),NULL,0,NULL);
                 mciSendString(TEXT("play song1 repeat"),NULL,0,NULL);
                 pow_score = 2;
@@ -869,6 +823,7 @@ void mode_seltct()
             //困难模式
         {
             ege::putimage(100,450,raw);
+            //ege::putimage(0,0,hell);
             if(msg.is_down())
             {
                 mciSendString(TEXT("close mysong"),NULL,0,NULL);
@@ -882,8 +837,9 @@ void mode_seltct()
         if(x>488&&y>585&&x<640&&y<680)
             //返回按钮
         {
-            if(msg.is_down())
+            if(msg.is_down() && flag == false)
             {
+                flag = true;
                 menu();
             }
         }
@@ -897,11 +853,21 @@ void loadImg()
     raw = ege::newimage();
     ranklist = ege::newimage();
     mode = ege::newimage();
+    close = ege::newimage();
+    open = ege::newimage();
+    hell = ege::newimage();
+    soso = ege::newimage();
+
     ege::getimage(img,"\\bk.jpg");
     ege::getimage(bk,"\\bk1.jpg");
     ege::getimage(ranklist,"\\rank.jpg");
     ege::getimage(raw,"\\raw.jpg");
     ege::getimage(mode,"\\mode.jpg");
+    ege::getimage(close,"\\close.jpg");
+    ege::getimage(open,"\\open.jpg");
+    ege::getimage(hell,"\\hell.jpg");
+    ege::getimage(soso,"\\soso.jpg");
+
 }
 void del_img()
 {
@@ -911,4 +877,26 @@ void del_img()
     ege::delimage(raw);
     ege::delimage(ranklist);
     ege::delimage(mode);
+    ege::delimage(close);
+    ege::delimage(open);
+    ege::delimage(hell);
+    ege::delimage(soso);
 }
+void open_Music()
+{
+    mciSendString(TEXT("open bgm.mp3 alias mysong"), NULL, 0,NULL);
+    mciSendString(TEXT("open bgm1.mp3 alias song1"), NULL, 0,NULL);
+    mciSendString(TEXT("open bgm2.mp3 alias song2"), NULL, 0,NULL);
+    mciSendString(TEXT("open bgm5.mp3 alias song3"),NULL,0,NULL);
+    mciSendString(TEXT("open bgm6.mp3 alias song4"),NULL,0,NULL);
+}
+void close_Music()
+{
+    mciSendString(TEXT("close mysong"), NULL, 0, NULL);
+    mciSendString(TEXT("close song1"), NULL, 0, NULL);
+    mciSendString(TEXT("close song2"), NULL, 0, NULL);
+    mciSendString(TEXT("close song3"), NULL, 0, NULL);
+    mciSendString(TEXT("close song4"), NULL, 0, NULL);
+
+}
+
