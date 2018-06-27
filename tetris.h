@@ -1,5 +1,6 @@
 #ifndef TETRIS_H_INCLUDED
 #define TETRIS_H_INCLUDED
+
 #include <graphics.h>
 #include <math.h>
 #include <stdio.h>
@@ -7,10 +8,11 @@
 #include<bits/stdc++.h>
 #include<windows.h>
 #include <mmsystem.h>
-
+#include<windows.h>
 #pragma comment(lib, "WINMM.LIB")
 #define SCRW 680
 #define SCRH 640
+#include <iostream>
 /********************************结构体区****************************/
 typedef struct AdATA
 {
@@ -48,7 +50,7 @@ bool flag = true;
 
 /***********************函数区域***************************/
 ADATA getTime();
-
+DWORD WINAPI playGame(LPVOID pM);
 int menu();
 int showlist();
 int Judge_down(ablock* block);
@@ -65,7 +67,7 @@ void mode_seltct();
 void clearone(int i);
 void clear_Music();
 void init_mouseseg();
-void draw_play_place();//绘制游戏区域
+//void draw_play_place();//绘制游戏区域
 void Double_PlayGame();//双人游戏
 void delete_ranklist_one();
 void rotate_(ablock* block);//旋转

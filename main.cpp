@@ -1,7 +1,8 @@
 #include "tetris.h"
+#include "omp.h"
 /*******************************
-    项目名称:
-    俄罗斯方块
+    项目名称:俄罗斯方块
+    文件名称:main.cpp
     创建日期:
     2018/6/10 12:09:32
     最后修改:
@@ -107,9 +108,12 @@ void playGame()
     //下一个方块
     int rk1=1+rand()%7;
     //随机产生1到7
-   for(int x=0; x<10; x++)
+    {
+    for(int x=0; x<10; x++)
         zt[x][20]=1;
-    for(int n=0;; Sleep(10),n++)
+    }
+    {
+        for(int n=0;; Sleep(10),n++)
         //主循环
     {
         one = getTime();
@@ -137,7 +141,9 @@ void playGame()
             PutOut();
 
         }
-        int k=kbmsg();
+        #pragma omp parallel
+        {
+            int k=kbmsg();
         //按键处理
         key_msg whatfx;
 
@@ -192,6 +198,8 @@ void playGame()
                 //绘制旋转后的块
             }
         }
+        }
+
         if(n==DELAY)
             //处理自由下落
         {
@@ -229,9 +237,16 @@ void playGame()
     PutOut();
     // }
 
+    }
+
+
 }
 int main()
 {
+
+
+    #pragma omp parallel num_threads(2)
+    {
     srand((unsigned)time(NULL));
     setinitmode(0);
     initgraph(SCRW,SCRH);
@@ -246,6 +261,8 @@ int main()
     closegraph();
     mciSendString(TEXT("close mysong"), NULL, 0, NULL);
     //关闭音乐
+    }
+
     return 0;
 }
 //根据旋转中心和类型（n,共七种）生成一个块
@@ -523,7 +540,7 @@ void rotate_(ablock* block)
     for(int i=0; i<4; i++)
         //如果旋转之后导致重叠或超出方格,则不旋转
     {
-        if((x1-(block->xy[i][1]-y1)-20>321)||(x1-(block->xy[i][1]-y1)-20<141))
+        if((x1-(block->xy[i][1]-y1)-20>=322)||(x1-(block->xy[i][1]-y1)-20<=142))
             return;
         if(zt[((x1-(block->xy[i][1]-y1)-20)-141)/20][(y1+block->xy[i][0]-x1-141)/20]==1)
             return;
@@ -797,6 +814,8 @@ void mode_seltct()
 
             if(msg.is_down())
             {
+                open_Music();
+                mciSendString(TEXT("play mysong repeat"),0,0,0);
                 pow_score = 1;
                 DELAY = 40;
                 playGame();
@@ -897,6 +916,5 @@ void close_Music()
     mciSendString(TEXT("close song2"), NULL, 0, NULL);
     mciSendString(TEXT("close song3"), NULL, 0, NULL);
     mciSendString(TEXT("close song4"), NULL, 0, NULL);
-
 }
 

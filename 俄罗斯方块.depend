@@ -13,7 +13,11 @@
 
 1529398936 source:f:\项目\俄罗斯方块\俄罗斯方块\save.cpp
 
-1529981596 source:f:\项目\俄罗斯方块\俄罗斯方块\tanwan-tetris\main.cpp
+1530067983 source:f:\项目\俄罗斯方块\俄罗斯方块\tanwan-tetris\main.cpp
+	"tetris.h"
+	"omp.h"
+
+1530065110 f:\项目\俄罗斯方块\俄罗斯方块\tanwan-tetris\tetris.h
 	<graphics.h>
 	<math.h>
 	<stdio.h>
@@ -21,4 +25,11 @@
 	<bits/stdc++.h>
 	<windows.h>
 	<mmsystem.h>
+	<windows.h>
+	<iostream>
+
+1530064937 source:f:\项目\俄罗斯方块\俄罗斯方块\tanwan-tetris\thread.cpp
+
+1530063256 f:\项目\俄罗斯方块\俄罗斯方块\tanwan-tetris\thread.cpp
+	"tetris.h"
 
