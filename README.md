@@ -7,3 +7,5 @@ EazyX
 main.cpp
 tetris.h
 
+
+早期作品，git都不会咋用
